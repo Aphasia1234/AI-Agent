@@ -15,7 +15,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 // mcp server 通过标准输入输出进行通信 与cursor/trae进行通信
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { UriTemplate } from '@modelcontextprotocol/sdk/shared/uriTemplate';
+//import { UriTemplate } from '@modelcontextprotocol/sdk/dist/esm/shared/uriTemplate';
 import { z } from 'zod';
 
 // tool 数据服务
@@ -68,7 +68,7 @@ server.registerResource('使用指南','docs://guide',{
         content:[
             {
                 uri:'docs://guide',
-                tmimeType:'text/plain',
+                mimeType:'text/plain',
                 text:'使用指南:\n- 工具介绍: 本MCP服务器提供查询用户信息的工具。\n- 参数说明: userId - 用户ID，例如: "001"。\n- 调用示例: {"method":"callTool","params":{"name":"query-user","arguments":{"userId":"001"}}}',
             }
         ]

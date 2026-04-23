@@ -85,3 +85,15 @@ Cursor: "用户001的信息是：张三，邮箱..."
 
 ## 在trae的mcp配置页面为什么可以看到调用工具的名称和描述
 每个 MCP 服务器在启动时，都会通过协议主动向 Trae 发送一份“工具清单”，清单上清晰地列出自己能提供的所有工具，以及每个工具的名称、功能描述和所需的参数。
+
+## MCP 开发流程
+- new McpServer 创建了mcp server 实例
+- server.registerTools  名字，描述， 函数
+- 通信方式 stdioServerTransport  HttpServerTransport
+- server.connect(transport)
+- host mcp 配置
+
+
+## mcp 直接入驻Agent 程序
+
+- 怎么把
