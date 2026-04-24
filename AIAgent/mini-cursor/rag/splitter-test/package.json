@@ -1,0 +1,18 @@
+{
+  "name": "splitter-test",
+  "version": "1.0.0",
+  "description": "- loader 加载的大Document @langchain/community\r - RecursiveCharacterTextSplitter 切割文档\r    Text\r - splitter \r     character 按这个切 符合语义\r     [\"。\",\"？\",\"！\",\"，\"] \r     优先级 。 最先\r     chunkSize 的靠近 递归的尝试，？！\r     保持语义完整性\r     切断 overlap 重叠 牺牲一定的空间(大约10%的chunkSize) 保持语义完整性",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/core": "^1.1.41",
+    "@langchain/textsplitters": "^1.0.1",
+    "dotenv": "^17.4.2",
+    "js-tiktoken": "^1.0.21"
+  }
+}
