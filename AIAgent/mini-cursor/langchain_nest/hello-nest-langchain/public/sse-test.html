@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE 流式接口测试</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+        }
+        #output{
+            height: 100vh;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>SSE 流式接口测试</h1>
+    <label for="apiURL">API 地址</label>
+    <input 
+    type="text"
+    id="apiURL"
+    value="http://localhost:3000"
+    placeholder="请输入 API 地址"
+    />
+    <label for="query">问题：</label>
+    <input 
+    type="text"
+    id="query"
+    placeholder="请输入问题"
+    value="你好"
+    />
+    <button>开始测试</button>
+    <p class="status" id="status"></p>
+    <div class="output" id="output"></div>
+</body>
+</html>
