@@ -9,7 +9,8 @@ import {
     ToolMessage, 
     AIMessageChunk 
 } from '@langchain/core/messages';
-import { StructuredTool } from '@langchain/core/tools';
+
+
 
 @Injectable()
 export class AiService {
@@ -21,16 +22,11 @@ export class AiService {
     private readonly modelWithTools: Runnable<BaseMessage[],AIMessage>;
     // 将LLM和业务逻辑分离 ，因为LLM变化太快
     // 注入了provide 的model
-    constructor(
-      @Inject('CHAT_MODEL') model:ChatOpenAI,
-      @Inject('QUERY_USER_TOOL') private readonly queryUserTool:StructuredTool,
-      @Inject('SEND_EMAIL_TOOL') private readonly sendEmailTool:StructuredTool,
-      @Inject('WEB_SEARCH_TOOL') private readonly webSearchTool:StructuredTool,
+    constructor(@Inject('CHAT_MODEL') model:ChatOpenAI,
+    @Inject('QUERY_USER_TOOL') private readonly queryUserTool:any,
   ){
         this.modelWithTools = model.bindTools([
-            this.queryUserTool,
-            this.sendEmailTool,
-            this.webSearchTool
+            this.queryUserTool
         ]);
     }
     // 同步调用 llm  完全生成后再返回
@@ -74,24 +70,6 @@ export class AiService {
         const toolName = toolCall.name;
         if(toolName === 'query_user'){
             const result = await this.queryUserTool.invoke(toolCall.args);
-            messages.push(
-                new ToolMessage({
-                    content:result,
-                    name:toolName,
-                    tool_call_id:toolCallId,
-                })
-            )
-        } else if(toolName === 'send_email'){
-            const result = await this.sendEmailTool.invoke(toolCall.args);
-            messages.push(
-                new ToolMessage({
-                    content:result,
-                    name:toolName,
-                    tool_call_id:toolCallId,
-                })
-            )
-        } else if(toolName === 'web_search'){
-            const result = await this.webSearchTool.invoke(toolCall.args);
             messages.push(
                 new ToolMessage({
                     content:result,

@@ -80,3 +80,11 @@ async/await 的前身
   - query_user
   把tool 作为 provide 再module 里声明，和原有的service 解耦
   依赖注入的方式 model.bindTools()
+
+## 邮件tool
+- 邮件服务
+  邮件服务器 提供http服务 (Web Server), 邮件服务，数据库服务 (3306)
+  npm i nodemailer @nestjs-module/mailer 接入nodemailer 
+  - 发送内容是邮件，不是 text/html
+  - 传输？ HTTP ? QQ邮箱提供的 SMTP 服务   408
+- 授权
