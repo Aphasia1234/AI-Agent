@@ -1,76 +1,109 @@
-import { Module,OnApplicationBootstrap,Inject } from '@nestjs/common';
+import { Module, OnApplicationBootstrap, Inject } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { AiModule } from './ai/ai.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
 // 定时任务
 import { CronJob } from 'cron';
-// nest.js 定时任务模块
+// nestjs 定时任务
 import { 
-  CronExpression, // 定时时间表达式
-  ScheduleModule, // 定时任务模块
-  SchedulerRegistry // 定时任务注册表
+  CronExpression,  // 定时时间表达式
+  ScheduleModule,  // 定时任务模块
+  SchedulerRegistry  // 定时任务注册表
 } from '@nestjs/schedule';
 import { JobModule } from './job/job.module';
 import { Job } from './job/entities/job.entity';
+import { ToolModule } from './tool/tool.module';
+import {
+  ConfigModule,
+  ConfigService
+} from '@nestjs/config';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { join } from 'path';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'Ray20040131!',
-      database: 'hello',
-      synchronize: true,// 是否自动同步数据库表结构
-      connectorPackage: 'mysql2',// 数据库驱动程序包mysql2
-      logging: true,// 是否开启日志记录
-      entities:[User,Job]// 引入实体类
-
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env'
+    }),
+    MailerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('MAIL_HOST'),
+          port: Number(configService.get<string>('MAIL_PORT')),
+          secure: configService.get<string>('MAIL_SECURE') === 'true',
+          auth: {
+            user: configService.get<string>('MAIL_USER'),
+            pass: configService.get<string>('MAIL_PASS')
+          }
+        },
+        defaults: {
+          from: configService.get<string>('MAIL_FROM')
+        }
+      })
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: "mysql",
+        host: configService.get<string>('MYSQL_HOST'),
+        port: Number(configService.get<string>('MYSQL_PORT')),
+        username: configService.get<string>('MYSQL_USERNAME'),
+        password: configService.get<string>('MYSQL_PASSWORD'),
+        database: configService.get<string>('MYSQL_DATABASE'),
+        synchronize: true, // 自动同步数据库
+        connectorPackage: "mysql2",
+        logging: true,
+        entities: [User, Job]
+      })
     }),
     UsersModule,
     AiModule,
     ScheduleModule.forRoot(),
     JobModule,
+    ToolModule
   ],
   controllers: [AppController],
   providers: [
     AppService
   ],
-})
-// 强制实现 OnApplicationBootstrap 接口，确保在应用启动时执行定时任务
-export class AppModule implements OnApplicationBootstrap {
+})// 强制类必须实现接口里规定的方法
+export class AppModule implements OnApplicationBootstrap{
   @Inject(SchedulerRegistry)
   schedulerRegistry: SchedulerRegistry;
-  async onApplicationBootstrap() {
-     const job = new CronJob(CronExpression.EVERY_MINUTE,()=>{
-      console.log('run cron job');
-     });
-     this.schedulerRegistry.addCronJob('job1',job);
-     // 启动定时任务,但不会立即执行,直到下一次时间表达式匹配时(整分时)才会执行
-     job.start();
-     // 5秒后停止定时任务
-     setTimeout(()=>{
-       this.schedulerRegistry.getCronJob('job1').stop();
-     },5000);
-     
-     const intervalRef = setInterval(()=>{
-      console.log('run interval job');
-     },1000);
-     this.schedulerRegistry.addInterval('interval1',intervalRef);
-     setTimeout(()=>{
-      this.schedulerRegistry.deleteInterval('interval1');
-     },5000);
 
-     const timeoutRef = setTimeout(()=>{
-      console.log('run timeout job');
-     },3000);
-     this.schedulerRegistry.addTimeout('timeout1',timeoutRef);
-     setTimeout(()=>{
-      this.schedulerRegistry.deleteTimeout('timeout1');
-     },5000);
+  async onApplicationBootstrap() {
+    // console.log('init');
+    // const job = new CronJob(CronExpression.EVERY_SECOND, ()=>{
+    //   console.log('run job');
+    // });
+    // this.schedulerRegistry.addCronJob('job1', job);
+    // job.start();
+    // setTimeout(() => {
+    //   this.schedulerRegistry.getCronJob('job1').stop();
+    // }, 5000);
+    // const intervalRef = setInterval(() => {
+    //   console.log('run interval job');
+    // }, 1000);
+    // this.schedulerRegistry.addInterval('interval1', intervalRef);
+    // setTimeout(() => {  
+    //   this.schedulerRegistry.deleteInterval('interval1');
+    // }, 5000);
+
+    // const timeoutRef = setTimeout(() => {
+    //   console.log('run timeout job');
+    // }, 3000);
+    // this.schedulerRegistry.addTimeout('timeout1', timeoutRef);
+    // setTimeout(() => {
+    //   this.schedulerRegistry.deleteTimeout('timeout1');
+    // }, 5000)
   }
 }
